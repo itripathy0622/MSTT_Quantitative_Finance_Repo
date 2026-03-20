@@ -1,2 +1,2 @@
-# MSTT_Quantitative_Finance_Repo
+# MSTT_Quantitative_Finance
 # MSTT-Quant-Models
