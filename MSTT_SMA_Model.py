@@ -12,7 +12,7 @@ Ticker = "TSLA"
 # ------ Downloading data ---------
 # data = yf.download(ticker, begin="", end="")
 data = yf.download(Ticker, period = "1y", interval = "1d")
-
+data.columns = data.columns.get_level_values(0)
 data = data.dropna()
 
 print(data.head())
@@ -21,22 +21,22 @@ print(data.head())
 
 # Create new column of 20 day mean; Rolling means using last 20 days
 data["SMA20"] = data["Close"].rolling(window = 20).mean()
-
 data["SMA50"] = data["Close"].rolling(window = 50).mean()
 
 
 # --------- Plotting Close and SMA ----------
 
-# plt.figure(figsize=(10,5))
-# plt.plot(data["Close"], label = ["Close Price"])
-# plt.plot(data["SMA20"], label="SMA20")
-# plt.plot(data["SMA50"], label="SMA50")
-# plt.title("SMA20 vs SMA50 vs Close")
-# plt.legend()
-# plt.show()
+plt.figure(figsize=(10,5))
+plt.plot(data["Close"], label = ["Close Price"])
+plt.plot(data["SMA20"], label="SMA20")
+plt.plot(data["SMA50"], label="SMA50")
+plt.title("SMA20 vs SMA50 vs Close")
+plt.legend()
+plt.show()
 
-
-# 1 is a hold, 0 is a sell
+###
+# # 1 is a hold, 0 is a sell
+data["Signal"] = 0
 data.loc[data["SMA20"] > data["SMA50"], "Signal"] = 1
 data["Market_Return"] = data["Close"].pct_change()
 data["Strategy_Return"] = data["Market_Return"] * data["Signal"].shift(1)
@@ -55,3 +55,9 @@ plt.plot(data["Strategy_Cumulative"], label = "Strategy_Return")
 plt.title("Market vs Strategy Return")
 plt.legend()
 plt.show()
+
+# New code for sma crossover
+
+data["Close"] = data["Close"].squeeze()
+
+data["Entry"] = (data["Close"] > data["SMA20"]) & (data["Close"].shift(1) <= data["SMA20"].shift(1))
